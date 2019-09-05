@@ -14,10 +14,7 @@ const Type = {
 const is = (arg, type) => Object.prototype.toString.call(arg).slice(8, -1) === type;
 
 export default class State {
-  constructor(
-    defaultState = {},
-    separator = `.`
-  ) {
+  constructor(defaultState = {}, separator = `.`) {
     this[Prop.STATE] = defaultState;
     this[Prop.LISTENERS] = {};
 
@@ -31,7 +28,7 @@ export default class State {
 
   setState(newState) {
     if (!is(newState, Type.OBJECT)) {
-      throw new TypeError(`The argument must be an object`)
+      throw new TypeError(`The argument must be an object`);
     }
 
     const diffState = this._merge(this[Prop.STATE], newState);
@@ -73,11 +70,15 @@ export default class State {
 
   emit(key, value) {
     const listeners = this[Prop.LISTENERS][key];
-    listeners && listeners.forEach((cb) => cb(value));
+    if (listeners) {
+      listeners.forEach((cb) => cb(value));
+    }
 
     if (!key.includes(this.separator)) {
       const allListener = this[Prop.LISTENERS][Prop.ON_ALL];
-      allListener && allListener.forEach((cb) => cb(key, value));
+      if (allListener) {
+        allListener.forEach((cb) => cb(key, value));
+      }
     }
   }
 
@@ -121,7 +122,7 @@ export default class State {
     }
 
     return changed;
-  };
+  }
 
   _emitter(obj, propArr = []) {
     for (let prop in obj) {
@@ -129,10 +130,7 @@ export default class State {
         const value = obj[prop];
         propArr.push(prop);
 
-        this.emit(
-          propArr.join(this.separator),
-          value
-        );
+        this.emit(propArr.join(this.separator), value);
 
         if (is(value, Type.OBJECT)) {
           this._emitter(value, propArr);
@@ -141,7 +139,7 @@ export default class State {
         propArr = [];
       }
     }
-  };
+  }
 
   static sync(first, second) {
     first.listen(second);

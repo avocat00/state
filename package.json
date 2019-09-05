@@ -1,26 +1,30 @@
 {
-  "name": "state.js",
+  "name": "@snilcy/state",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --open",
-    "eslint": "eslint src/**/*.js",
+    "eslint": "eslint index.js",
     "test": "npm run eslint"
   },
   "devDependencies": {
-    "css-loader": "3.2.0",
     "eslint": "6.1.0",
-    "eslint-config-htmlacademy": "0.5.2",
-    "style-loader": "1.0.0",
-    "webpack": "4.39.1",
-    "webpack-cli": "3.3.6",
-    "webpack-dev-server": "3.7.2"
+    "eslint-config-htmlacademy": "0.5.2"
   },
   "engines": {
     "node": "10"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avocat00/state.git"
+  },
+  "bugs": {
+    "url": "https://github.com/avocat00/state/issues"
+  },
+  "homepage": "https://github.com/avocat00/state#readme",
+  "description": ""
 }
