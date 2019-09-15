@@ -3,6 +3,9 @@ const Prop = {
   EVENT: Symbol(`event`),
   LISTENERS: Symbol(`listeners`),
   ON_ALL: Symbol(`on all`),
+  EMIT: Symbol(`emit`),
+  EMITTER: Symbol(`emmiter`),
+  MERGE: Symbol(`merge`),
 };
 
 const Type = {
@@ -15,7 +18,9 @@ const is = (arg, type) => Object.prototype.toString.call(arg).slice(8, -1) === t
 
 export default class State {
   constructor(defaultState = {}, separator = `.`) {
-    this[Prop.STATE] = defaultState;
+    this[Prop.STATE] = {
+      ...defaultState,
+    };
     this[Prop.LISTENERS] = {};
 
     this.listened = [];
@@ -31,8 +36,8 @@ export default class State {
       throw new TypeError(`The argument must be an object`);
     }
 
-    const diffState = this._merge(this[Prop.STATE], newState);
-    this._emitter(diffState);
+    const diffState = this[Prop.MERGE](this[Prop.STATE], newState);
+    this[Prop.EMITTER](diffState);
   }
 
   on(key, callback) {
@@ -68,20 +73,6 @@ export default class State {
     this.off(Prop.ON_ALL, callback);
   }
 
-  emit(key, value) {
-    const listeners = this[Prop.LISTENERS][key];
-    if (listeners) {
-      listeners.forEach((cb) => cb(value));
-    }
-
-    if (!key.includes(this.separator)) {
-      const allListener = this[Prop.LISTENERS][Prop.ON_ALL];
-      if (allListener) {
-        allListener.forEach((cb) => cb(key, value));
-      }
-    }
-  }
-
   listen(stateEl) {
     if (this.listened.includes(stateEl)) {
       return;
@@ -98,7 +89,37 @@ export default class State {
     State.sync(this, stateEl);
   }
 
-  _merge(oldState, newState, changed = {}) {
+  triggerState(propsArr) {
+    if (!propsArr) {
+      this[Prop.EMITTER](this.state);
+      return;
+    }
+
+    const state = Object.keys(this.state)
+      .filter(key => propsArr.includes(key))
+      .reduce((obj, prop) => ({
+        ...obj,
+        [prop]: this.state[prop],
+      }), {});
+
+    this[Prop.EMITTER](state);
+  }
+
+  [Prop.EMIT](key, value) {
+    const listeners = this[Prop.LISTENERS][key];
+    if (listeners) {
+      listeners.forEach((cb) => cb(value));
+    }
+
+    if (!key.includes(this.separator)) {
+      const allListener = this[Prop.LISTENERS][Prop.ON_ALL];
+      if (allListener) {
+        allListener.forEach((cb) => cb(key, value));
+      }
+    }
+  }
+
+  [Prop.MERGE](oldState, newState, changed = {}) {
     for (let prop in newState) {
       if (newState.hasOwnProperty(prop)) {
         const newValue = newState[prop];
@@ -111,7 +132,7 @@ export default class State {
           }
 
           if (is(newValue, Type.OBJECT)) {
-            changed[prop] = this._merge(oldValue, newValue);
+            changed[prop] = this[Prop.MERGE](oldValue, newValue);
             continue;
           }
         }
@@ -124,16 +145,16 @@ export default class State {
     return changed;
   }
 
-  _emitter(obj, propArr = []) {
+  [Prop.EMITTER](obj, propArr = []) {
     for (let prop in obj) {
       if (obj.hasOwnProperty(prop)) {
         const value = obj[prop];
         propArr.push(prop);
 
-        this.emit(propArr.join(this.separator), value);
+        this[Prop.EMIT](propArr.join(this.separator), value);
 
         if (is(value, Type.OBJECT)) {
-          this._emitter(value, propArr);
+          this[Prop.EMITTER](value, propArr);
         }
 
         propArr = [];

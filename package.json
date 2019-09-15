@@ -1,21 +1,23 @@
 {
   "name": "@snilcy/state",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
-    "start": "webpack-dev-server --open",
     "eslint": "eslint index.js",
-    "test": "npm run eslint"
+    "mocha": "mocha index.test.js",
+    "test": "npm run eslint && npm run mocha",
+    "preversion": "npm test",
+    "postversion": "npm publish --tag=next",
+    "postpublish": "git push origin --all; git push origin --tags"
   },
   "devDependencies": {
     "eslint": "6.1.0",
-    "eslint-config-htmlacademy": "0.5.2"
+    "mocha": "^6.2.0"
   },
   "engines": {
     "node": "10"
   },
-  "author": "",
+  "author": "Johnny Rocket",
   "license": "ISC",
   "dependencies": {},
   "repository": {
