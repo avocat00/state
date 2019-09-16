@@ -8,7 +8,7 @@
     "test": "npm run eslint && npm run mocha",
     "preversion": "npm test",
     "postversion": "npm publish --tag=next",
-    "postpublish": "git push origin && git push origin --tags"
+    "postpublish": "git push origin --tags"
   },
   "devDependencies": {
     "eslint": "6.1.0",
