@@ -1,5 +1,3 @@
-// test
-
 const Prop = {
   STATE: Symbol(`state`),
   EVENT: Symbol(`event`),
